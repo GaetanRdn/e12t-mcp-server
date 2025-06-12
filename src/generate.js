@@ -40,7 +40,7 @@ async function generateWithGroq(prompt) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            model: 'mixtral-8x7b-32768',
+            model: 'mixtral-8x7b',
             messages: [
                 { role: 'system', content: 'Tu es un expert Angular.' },
                 { role: 'user', content: prompt },
