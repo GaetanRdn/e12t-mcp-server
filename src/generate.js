@@ -50,5 +50,6 @@ async function generateWithGroq(prompt) {
     });
 
     const data = await res.json();
+    console.log('📦 Groq response:', JSON.stringify(data, null, 2));
     return data?.choices?.[0]?.message?.content ?? 'Erreur : aucune réponse Groq.';
 }
