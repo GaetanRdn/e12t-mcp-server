@@ -69,9 +69,9 @@ app.post('/generate', async (req, res) => {
             return res.json({ answer: `⚠️ ${reason}` });
         }
 
-        const chunks = searchChunks(cleanQuestion);
+        const chunks = getContextChunks(cleanQuestion, 3);
         const prompt = buildPrompt(chunks, cleanQuestion);
-        const answer = await generateWithGroq(prompt);
+        const answer = await generateFromPrompt(prompt);
 
         return res.json({ answer });
     } catch (err) {
