@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { getContextChunks } from './context.js';
 import { buildPrompt } from './prompt.js';
+import {generateFromPrompt} from "./generate";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +25,17 @@ app.get('/prompt', (req, res) => {
     const chunks = getContextChunks(query, 3);
     const prompt = buildPrompt(chunks, query);
     res.json({ prompt });
+});
+
+app.post('/generate', async (req, res) => {
+    const { q } = req.body;
+    if (!q) return res.status(400).json({ error: 'Missing q (question)' });
+
+    const chunks = getContextChunks(q, 3);
+    const prompt = buildPrompt(chunks, q);
+    const answer = await generateFromPrompt(prompt);
+
+    res.json({ question: q, answer });
 });
 
 app.listen(port, () => {
