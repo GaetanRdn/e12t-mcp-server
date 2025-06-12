@@ -56,23 +56,30 @@ app.get('/prompt', (req, res) => {
 });
 
 app.post('/generate', async (req, res) => {
-    const { q } = req.body;
+    try {
+        const { q } = req.body;
 
-    if (!q) return res.status(400).json({ error: 'Missing q (question)' });
+        if (!q) {
+            return res.status(400).json({ error: 'Missing `q` in body.' });
+        }
 
-    const { blocked, question, reason } = sanitizeQuestion(q);
+        const { blocked, question: cleanQuestion, reason } = sanitizeQuestion(q);
 
-    if (blocked) {
-        return res.json({ answer: `⚠️ ${reason}` });
+        if (blocked) {
+            return res.json({ answer: `⚠️ ${reason}` });
+        }
+
+        const chunks = searchChunks(cleanQuestion);
+        const prompt = buildPrompt(chunks, cleanQuestion);
+        const answer = await generateWithGroq(prompt);
+
+        return res.json({ answer });
+    } catch (err) {
+        console.error('❌ Erreur MCP interne:', err);
+        return res.status(500).json({ error: 'Erreur interne du serveur MCP.' });
     }
-
-    const chunks = getContextChunks(question, 3);
-    const prompt = buildPrompt(chunks, question);
-
-    const answer = await generateFromPrompt(prompt);
-
-    res.json({ question, answer });
 });
+
 
 app.listen(port, () => {
     console.log(`✅ E12T MCP server listening at http://localhost:${port}`);
