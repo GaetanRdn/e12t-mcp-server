@@ -9,6 +9,10 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.send('✅ E12T MCP Server is up and running!');
+});
+
 app.get('/context', (req, res) => {
     const query = req.query.q || '';
     const chunks = getContextChunks(query, 3);
