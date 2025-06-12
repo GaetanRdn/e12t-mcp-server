@@ -60,18 +60,18 @@ app.post('/generate', async (req, res) => {
 
     if (!q) return res.status(400).json({ error: 'Missing q (question)' });
 
-    const { blocked, reason } = sanitizeQuestion(q);
+    const { blocked, question, reason } = sanitizeQuestion(q);
 
     if (blocked) {
         return res.json({ answer: `⚠️ ${reason}` });
     }
 
-    const chunks = getContextChunks(q, 3);
-    const prompt = buildPrompt(chunks, q);
-    console.log(prompt);
+    const chunks = getContextChunks(question, 3);
+    const prompt = buildPrompt(chunks, question);
+
     const answer = await generateFromPrompt(prompt);
 
-    res.json({ question: q, answer });
+    res.json({ question, answer });
 });
 
 app.listen(port, () => {
