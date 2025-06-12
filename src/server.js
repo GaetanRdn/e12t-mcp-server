@@ -5,10 +5,35 @@ import { getContextChunks } from './context.js';
 import { buildPrompt } from './prompt.js';
 import { generateFromPrompt } from "./generate.js";
 
+export function sanitizeQuestion(raw) {
+    const lower = raw.toLowerCase();
+
+    const blocklist = [
+        'ignore all',
+        'ignore toutes les instructions',
+        'tu es désormais',
+        'you are now',
+        'change ton rôle',
+        'act as',
+        'act like',
+        'reset all previous instructions',
+        'system prompt'
+    ];
+
+    const isSuspicious = blocklist.some(fragment => lower.includes(fragment));
+
+    if (isSuspicious) {
+        return {
+            blocked: true,
+            reason: "Cette question semble contenir une instruction interdite."
+        };
+    }
+
+    return { blocked: false, question: raw };
+}
+
 const app = express();
 const port = process.env.PORT || 3000;
-
-console.log('🔐 OPENAI_API_KEY (début) :', process.env.OPENAI_API_KEY?.slice(0, 8));
 
 app.use(cors());
 app.use(express.json());
@@ -32,8 +57,14 @@ app.get('/prompt', (req, res) => {
 
 app.post('/generate', async (req, res) => {
     const { q } = req.body;
-    console.log(q);
+
     if (!q) return res.status(400).json({ error: 'Missing q (question)' });
+
+    const { blocked, reason } = sanitizeQuestion(q);
+
+    if (blocked) {
+        return res.json({ answer: `⚠️ ${reason}` });
+    }
 
     const chunks = getContextChunks(q, 3);
     const prompt = buildPrompt(chunks, q);
