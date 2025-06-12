@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-const OPENAI_KEY = process.env.OPENAI_API_KEY; // à placer dans Vercel env
+const OPENAI_KEY = process.env.OPENAI_API_KEY;
 const PROVIDER = process.env.LLM_PROVIDER || 'openai'; // 'openai' ou 'groq'
 
 export async function generateFromPrompt(prompt) {
@@ -32,15 +32,14 @@ async function generateWithOpenAI(prompt) {
 }
 
 async function generateWithGroq(prompt) {
-    const GROQ_KEY = process.env.GROQ_API_KEY;
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-            Authorization: `Bearer ${GROQ_KEY}`,
+            Authorization: `Bearer ${OPENAI_KEY}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            model: 'mixtral-8x7b',
+            model: 'llama3-70b-8192',
             messages: [
                 { role: 'system', content: 'Tu es un expert Angular.' },
                 { role: 'user', content: prompt },
