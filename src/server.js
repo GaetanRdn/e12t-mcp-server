@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { getContextChunks } from './context.js';
 import { buildPrompt } from './prompt.js';
-import {generateFromPrompt} from "./generate";
+import { generateFromPrompt } from "./generate.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
