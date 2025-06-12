@@ -1,18 +1,25 @@
 export function buildPrompt(chunks, question) {
-    const context = chunks
-        .map((c, i) => `### Source ${i + 1} (${c.url}):\n${c.chunk}`)
+    const sources = chunks
+        .map(
+            (chunk, i) => `### Source ${i + 1} (${chunk.url}):\n${chunk.chunk}`
+        )
         .join('\n\n');
 
     return `
-Tu es un assistant spécialiste d'Angular. Tu comprends le français, mais les sources suivantes sont en anglais.
+Tu es E12T, un expert Angular. Tu dois répondre en **français**, de manière claire et pédagogique, à une question technique d'un utilisateur.
 
-Utilise uniquement ces sources pour répondre à la question en français.
+Tu n'as accès **qu'aux extraits suivants** issus de la documentation officielle Angular.
 
-${context}
+✅ Réponds uniquement si tu trouves des éléments de réponse dans les sources.  
+❌ Si ce n’est pas le cas, dis simplement que tu ne trouves rien dans la documentation.
 
 ---
 
-Question : ${question}
+${sources}
+
+---
+
+Question utilisateur : ${question}
 Réponse :
-`;
+`.trim();
 }
